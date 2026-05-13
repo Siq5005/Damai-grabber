@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_CONFIG: dict[str, Any] = {
+    "mode": "desktop",
     "chrome_path": "",
     "debug_port": 9222,
     "grab": {
@@ -11,6 +12,13 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "retry_interval_ms": 500,
         "poll_interval_ms": 50,
         "confirm_timeout_ms": 5000,
+    },
+    "mobile": {
+        "device_serial": "",
+        "max_retries": 20,
+        "click_interval_ms": 50,
+        "confirm_clicks": 10,
+        "advance_seconds": 0.5,
     },
     "ntp": {
         "servers": ["ntp.aliyun.com", "ntp.tencent.com", "cn.pool.ntp.org"],
