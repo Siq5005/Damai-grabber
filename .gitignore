@@ -1,6 +1,9 @@
 # Claude Code
 .claude/
 
+# Docs (internal design specs and plans)
+docs/
+
 
 # Python
 __pycache__/

@@ -16,7 +16,11 @@
     "advance_seconds": 0.5
   },
   "ntp": {
-    "servers": ["ntp.aliyun.com", "ntp.tencent.com", "cn.pool.ntp.org"],
+    "servers": [
+      "ntp.aliyun.com",
+      "ntp.tencent.com",
+      "cn.pool.ntp.org"
+    ],
     "timeout_s": 3
   }
 }
