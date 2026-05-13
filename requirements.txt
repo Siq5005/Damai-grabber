@@ -2,5 +2,6 @@ PyQt6>=6.5
 playwright>=1.40
 playwright-stealth>=1.0
 ntplib>=0.4
+uiautomator2>=3.0
 pytest>=7.0
 pytest-asyncio>=0.23
