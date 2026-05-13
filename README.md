@@ -1,6 +1,6 @@
 # DamaiGrabber — 大麦网抢票工具
 
-一个桌面 GUI 工具，帮助你在大麦网开票瞬间自动完成"点击购买"和"确认订单"两个操作。
+一个桌面 GUI 工具，帮助你在大麦网开票瞬间自动完成"点击购买"和"确认订单"两个操作。其实是为了方便我抢各种二游演唱会的门票。
 
 ## 工作原理
 
@@ -22,7 +22,7 @@
 ## 安装
 
 ```bash
-git clone https://github.com/siqizhu5005-a11y/Damai-grabber.git
+git clone https://github.com/Siq5005/Damai-grabber.git
 cd Damai-grabber
 pip install -r requirements.txt
 playwright install chromium
