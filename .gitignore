@@ -4,6 +4,9 @@
 # Docs (internal design specs and plans)
 docs/
 
+# Tests
+tests/
+
 
 # Python
 __pycache__/
