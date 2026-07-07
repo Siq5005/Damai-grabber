@@ -17,7 +17,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "device_serial": "",
         "max_retries": 20,
         "click_interval_ms": 50,
-        "confirm_clicks": 10,
+        "confirm_timeout_s": 20,
         "advance_seconds": 0.5,
     },
     "ntp": {

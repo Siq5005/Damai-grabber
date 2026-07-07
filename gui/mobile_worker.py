@@ -94,7 +94,7 @@ class MobileGrabWorker(QThread):
         grabber = MobileGrabber(
             max_retries=self.grab_config.get("max_retries", 20),
             click_interval_ms=self.grab_config.get("click_interval_ms", 50),
-            confirm_clicks=self.grab_config.get("confirm_clicks", 10),
+            confirm_timeout_s=self.grab_config.get("confirm_timeout_s", 20),
         )
 
         result: GrabResult = grabber.run(

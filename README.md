@@ -1,6 +1,6 @@
 # DamaiGrabber — 大麦网抢票工具
 
-一个桌面 GUI 工具，帮助你在大麦网开票瞬间自动完成"点击购买"和"确认订单"两个操作。支持桌面端（Chrome 浏览器）**和**移动端（Android 手机 APP）两种抢票模式。初衷是为了帮我抢音律联觉的票，不过可能ipad的台前调度更好用也说不定。
+一个桌面 GUI 工具，帮助你在大麦网开票瞬间自动完成"点击购买"和"确认订单"两个操作。支持桌面端（Chrome 浏览器）**和**移动端（Android 手机 APP）两种抢票模式。初衷是为了帮我抢音律联觉的票，不过可能ipad的台前调度更好用也说不定。本质比不过脚本操作，单纯就是校准时间加前台快速点击，脚本直接发包肯定更稳。
 
 ## 两种抢票模式
 
@@ -20,7 +20,7 @@
 
 ```
 你手动完成：手机登录大麦APP → 选演出 → 选场次/票价/观演人 → 停在购买页面
-工具自动完成：NTP校时 → 精准倒计时 → 连点"立即预订" → 连点"提交订单"
+工具自动完成：NTP校时 → 精准倒计时 → 连点"立即购票" → 连点"提交订单"
 你手动完成：在手机上支付
 ```
 
@@ -29,7 +29,7 @@
 - Python 3.9+ / PyQt6（GUI）
 - Playwright（桌面端浏览器自动化，通过 CDP 协议连接）
 - 内联 JS 反检测（去自动化指纹，无第三方依赖）
-- uiautomator2（移动端 Android 设备控制）
+- uiautomator2 2.16.26（移动端 Android 设备控制；钉在 2.x — 3.x 在 HyperOS 2 / Android 15 等系统上点击会被 `INJECT_EVENTS` 拦截，详见下方[故障排查](#故障排查)）
 - ntplib（NTP 时间同步）
 
 ## 安装
@@ -91,6 +91,34 @@ macOS 用户也可以直接双击 `start.command`。
 6. 工具自动执行：NTP 校时 → 倒计时 → 连点购买 → 连点确认
 7. 在手机上完成支付
 
+> HyperOS / MIUI 等系统限制「程序从后台拉起其他 App」，本工具不会自动启动大麦——**抢票前请手动把大麦开到购票页并保持前台**，工具只负责到点点击（开始前会检查前台是否为大麦并提示）。
+>
+> 提交订单遇拥堵时大麦会弹「请重试」弹窗，工具会自动持续点弹窗里的「重试」按钮直到提交成功（跳支付页）或超时（`mobile.confirm_timeout_s`，默认 20s）。
+
+## 故障排查
+
+### 移动端点击报 `INJECT_EVENTS` / `SecurityException`
+
+**现象**：移动端抢票点击时（或日志里）出现
+
+```
+java.lang.SecurityException: Injecting input events requires the caller ... to have the INJECT_EVENTS permission
+```
+
+**原因**：HyperOS 2（小米 15 等）/ Android 15 等系统在 `injectInputEventToTarget`（定向输入注入 API）处拒绝跨应用注入。`uiautomator2` **3.x** 的 WeTest jar 服务端、以及 `adb shell input tap` 都走这个定向 API，所以全部失败——这是系统级拦截，与「USB 调试（安全设置）」开关**无关**，开了也拦。未 root 的设备（bootloader 锁定）连 `su` 兜底也用不上。
+
+**解决**：本工具已把 `uiautomator2` 钉在 **2.16.26**（见 `requirements.txt`）。2.x 用经典**非定向** `UiAutomation.injectInputEvent`（UiAutomation 的特权注入路径，不需要 `INJECT_EVENTS`），可正常点击。若你的环境被升级到了 3.x，降回即可：
+
+```bash
+pip install uiautomator2==2.16.26
+```
+
+`core/mobile_grabber.py` 内还内置了注入降级兜底：uia 注入若仍失败，会自动依次尝试 `shell input` → `adb input` → `su input`（需 root），并打印清晰提示。正常设备上走 uia 层即可，不会触发兜底。
+
+### 大麦无法被自动切到前台
+
+HyperOS / MIUI 限制后台拉起 App。请**手动**把大麦开到购票页并保持前台（见上文移动端流程的提示）。
+
 ## 配置
 
 编辑 `config.json` 自定义参数：
@@ -110,7 +138,7 @@ macOS 用户也可以直接双击 `start.command`。
     "device_serial": "",
     "max_retries": 20,
     "click_interval_ms": 50,
-    "confirm_clicks": 10,
+    "confirm_timeout_s": 20,
     "advance_seconds": 0.5
   },
   "ntp": {
@@ -130,7 +158,7 @@ macOS 用户也可以直接双击 `start.command`。
 | `mobile.device_serial` | Android 设备序列号，留空自动检测 |
 | `mobile.max_retries` | 移动端购买按钮连点次数 |
 | `mobile.click_interval_ms` | 移动端连点间隔（毫秒） |
-| `mobile.confirm_clicks` | 移动端确认订单坐标连点次数 |
+| `mobile.confirm_timeout_s` | 移动端提交订单重试超时（秒，默认 20）；拥堵弹「重试」时持续重试到此超时 |
 | `mobile.advance_seconds` | 提前开始点击的秒数 |
 
 ## 反检测说明

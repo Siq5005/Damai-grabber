@@ -1,6 +1,6 @@
 PyQt6>=6.5
 playwright>=1.40
 ntplib>=0.4
-uiautomator2>=3.0
+uiautomator2==2.16.26  # pin to 2.x: 3.x 用 WeTest jar 走 injectInputEventToTarget，在 HyperOS 2 等系统会因 INJECT_EVENTS 被拒；2.x 的 APK 服务端走经典非定向 UiAutomation.injectInputEvent，不受此限
 pytest>=7.0
 pytest-asyncio>=0.23
